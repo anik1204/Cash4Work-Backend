@@ -1,6 +1,7 @@
-const db = require('./dbCon');
+const db = require("./modules/dbCon");
 
-db.query(`CREATE TABLE IF NOT EXISTS users(
+db.query(
+	`CREATE TABLE IF NOT EXISTS users(
     id int primary key auto_increment,
     fname varchar(255) not null,
     lname varchar(255) not null,
@@ -8,8 +9,10 @@ db.query(`CREATE TABLE IF NOT EXISTS users(
     password varchar(255) not null,
     dob DATE,
     reg_date DATETIME
-)`, function(err, results, fields) {
-    if (err) {
-        console.log(err.message);
-    }
-});
+)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);

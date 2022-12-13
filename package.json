@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/anik1204/Cash4Work-Backend#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1"
   }
 }
