@@ -93,11 +93,22 @@ router.post("/login", async (req, res) => {
 			const search_query = mysql.format(sqlSearch, [email.toLowerCase()]);
 			await connection.query(search_query, async (err, result) => {
 				if (err) throw err;
-				connection.release();
 				if (result.length != 0) {
 					if (result[0].password == hashedPassword) {
 						const token = generateAccessToken({ email: "" + email });
 						res.json({ accessToken: token });
+						const sqlUpdate =
+							"INSERT INTO tokens (email, token) VALUES(?,?) ON DUPLICATE KEY UPDATE email=?, token=?";
+						const insert_query = mysql.format(sqlUpdate, [
+							email.toLowerCase(),
+							token,
+							email.toLowerCase(),
+							token,
+						]);
+						connection.query(insert_query, (err, result) => {
+							connection.release();
+							if (err) throw err;
+						});
 					} else res.status(409).send({ message: "Incorrect password" });
 				} else res.status(404).send({ message: "User not found!" });
 			});
@@ -106,6 +117,40 @@ router.post("/login", async (req, res) => {
 		res.send({
 			message:
 				"Please include all the necessary infromation { email, password }",
+		});
+});
+
+router.post("/verify", async (req, res) => {
+	let body = req.body;
+	if ("token" in body && "email" in body) {
+		const token =
+			req.body.token ||
+			req.body.accessToken ||
+			req.query.token ||
+			req.headers["x-access-token"];
+		const email = req.body.email;
+		const sqlSearch = "SELECT token FROM tokens WHERE email = ?";
+		const search_query = mysql.format(sqlSearch, [email.toLowerCase()]);
+		db.getConnection(async (err, connection) => {
+			if (err) throw err;
+			await connection.query(search_query, async (err, result) => {
+				connection.release();
+				if (err) throw err;
+				if (result.length != 0) {
+					if (result[0].token == token) {
+						jwt.verify(token, process.env.JWT_TOKEN_KEY, (err, user) => {
+							if (err) {
+								return res.sendStatus(403);
+							}
+							res.status(200).send({ message: "Valid Token" });
+						});
+					} else res.status(409).send({ message: "Invalid token" });
+				} else res.status(404).send({ message: "Token not found!" });
+			});
+		});
+	} else
+		res.send({
+			message: "Please include all the necessary infromation { token, email }",
 		});
 });
 

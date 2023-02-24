@@ -51,3 +51,15 @@ db.query(
 		}
 	}
 );
+db.query(
+	`CREATE TABLE IF NOT EXISTS tokens(
+    id int primary key auto_increment,
+    email varchar(255) unique,
+    token longtext not null
+)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);

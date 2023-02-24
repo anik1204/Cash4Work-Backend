@@ -4,7 +4,10 @@ const config = process.env;
 
 const verifyToken = (req, res, next) => {
 	const token =
-		req.body.token || req.query.token || req.headers["x-access-token"];
+		req.body.token ||
+		req.body.accessToken ||
+		req.query.token ||
+		req.headers["x-access-token"];
 	const email = req.body.email;
 	console.log(email);
 	if (!token) {
@@ -14,6 +17,7 @@ const verifyToken = (req, res, next) => {
 		const decoded = jwt.verify(token, config.JWT_TOKEN_KEY);
 		console.log(jwt.decode(token));
 		req.user = decoded;
+		res.status(200).send("Valid Token");
 	} catch (err) {
 		return res.status(401).send("Invalid Token");
 	}
