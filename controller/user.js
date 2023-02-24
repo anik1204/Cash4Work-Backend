@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 dotenv.config();
 function generateAccessToken(email) {
-	return jwt.sign({ email }, process.env.JWT_TOKEN_KEY, {
+	return jwt.sign(email, process.env.JWT_TOKEN_KEY, {
 		expiresIn: "2h",
 	});
 }
@@ -96,7 +96,7 @@ router.post("/login", async (req, res) => {
 				connection.release();
 				if (result.length != 0) {
 					if (result[0].password == hashedPassword) {
-						const token = generateAccessToken({ email: email });
+						const token = generateAccessToken({ email: "" + email });
 						res.json({ accessToken: token });
 					} else res.status(409).send({ message: "Incorrect password" });
 				} else res.status(404).send({ message: "User not found!" });

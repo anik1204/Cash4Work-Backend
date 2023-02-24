@@ -4,7 +4,8 @@
   "description": "Short Term Job Seeking App",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tables": "node ./modules/tables.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "socket.io": "^4.5.4"
   }
 }
