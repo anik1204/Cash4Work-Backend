@@ -27,6 +27,7 @@ db.query(
     location varchar(255) not null,
     salary float,
     need_on DATE,
+    active boolean not null,
     post_date DATETIME
 )`,
 	function (err, results, fields) {
@@ -70,7 +71,21 @@ db.query(
     sender int not null,
     receiver int not null,
     message longtext,
-    time DATETIME
+    msg_date DATETIME
+)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
+
+db.query(
+	`CREATE TABLE IF NOT EXISTS applied_jobs(
+    id int primary key auto_increment,
+    job_id int not null,
+    applied_by int not null,
+    apply_date DATETIME
 )`,
 	function (err, results, fields) {
 		if (err) {
