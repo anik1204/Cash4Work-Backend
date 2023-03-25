@@ -63,3 +63,18 @@ db.query(
 		}
 	}
 );
+
+db.query(
+	`CREATE TABLE IF NOT EXISTS messages(
+    id int primary key auto_increment,
+    sender int not null,
+    receiver int not null,
+    message longtext,
+    time DATETIME
+)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
