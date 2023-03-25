@@ -89,14 +89,15 @@ router.post("/login", async (req, res) => {
 		const hashedPassword = hashPassword(password);
 		db.getConnection(async (err, connection) => {
 			if (err) throw err;
-			const sqlSearch = "SELECT password FROM users WHERE email = ?";
+			const sqlSearch = "SELECT password, id FROM users WHERE email = ?";
 			const search_query = mysql.format(sqlSearch, [email.toLowerCase()]);
 			await connection.query(search_query, async (err, result) => {
 				if (err) throw err;
 				if (result.length != 0) {
 					if (result[0].password == hashedPassword) {
 						const token = generateAccessToken({ email: "" + email });
-						res.json({ accessToken: token });
+						console.log(result[0].id)
+						res.json({ accessToken: token, id: result[0].id });
 						const sqlUpdate =
 							"INSERT INTO tokens (email, token) VALUES(?,?) ON DUPLICATE KEY UPDATE email=?, token=?";
 						const insert_query = mysql.format(sqlUpdate, [

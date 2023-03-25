@@ -44,11 +44,12 @@ router.post("/", async (req, res) => {
 		"need_on" in body
 	) {
 		const { title, posted_by, description, location, salary, need_on } = body;
-		geocoder
+		let latitude, longitude;
+		await geocoder
 			.geocode(location)
 			.then((res) => {
-				const latitude = res[0].latitude;
-				const longitude = res[0].longitude;
+				 latitude = res[0].latitude;
+				 longitude = res[0].longitude;
 				console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 			})
 			.catch((err) => {
@@ -73,7 +74,7 @@ router.post("/", async (req, res) => {
 				connection.release();
 				if (err) throw err;
 				console.log(result.insertId);
-				res.status(201).send({ message: "Job Posted Successfully." });
+				res.status(201).send({ message: "Job Posted Successfully.", id: result.insertId });
 			});
 		});
 	} else
@@ -120,13 +121,40 @@ router.post("/apply", async (req, res) => {
 			applied_by,
 			getDate(),
 		]);
-		await connection.query(insert_query, async (err, result) => {
+		const sqlSelect = "SELECT * FROM applied_jobs WHERE applied_by = ? AND job_id = ?";
+		const select_query = mysql.format(sqlSelect, [applied_by, job_id]);
+		await connection.query(select_query, (err, result) => {
 			connection.release();
 			if (err) throw err;
-			console.log(result.insertId);
-			res.status(201).send({ message: "Applied to job successfully." });
+			if(result.length > 0){
+				res.status(200).send({ message: "Already applied to this job." });
+				return;
+			}
+		});
+		db.getConnection(async (err, connection) => {
+			await connection.query(insert_query, async (err, result) => {
+				connection.release();
+				if (err) throw err;
+				console.log(result.insertId);
+				res.status(201).send({ message: "Applied to job successfully." });
+			});
 		});
 	});
 });
+
+router.get("/applied/:id", async (req, res) => {
+	const id = req.params.id;
+	db.getConnection(async (err, connection) => {
+		if (err) throw err;
+		const sqlSelect = "SELECT * FROM applied_jobs WHERE applied_by = ?";
+		const select_query = mysql.format(sqlSelect, [id]);
+		await connection.query(select_query, (err, result) => {
+			connection.release();
+			if (err) throw err;
+			res.status(200).send(result);
+		});
+	});
+});
+
 
 module.exports = router;
