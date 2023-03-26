@@ -11,6 +11,9 @@ const db = require("./modules/dbCon"); //importing mysql db connection
 const userController = require("./controller/user");
 const ratingController = require("./controller/rating");
 const jobController = require("./controller/job");
+const messageController = require("./controller/message");
+
+const { pushMessages, pullMessages } = require("./modules/message");
 //importing token authentication
 const auth = require("./middleware/auth");
 
@@ -22,6 +25,7 @@ app.use(bodyParser.json());
 app.use("/user", userController);
 app.use("/rating", ratingController);
 app.use("/jobs", jobController);
+app.use("/message", messageController);
 app.post("/welcome", auth, (req, res) => {
 	res.status(200).send("Welcome 🙌 ");
 });

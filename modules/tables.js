@@ -67,7 +67,7 @@ db.query(
 
 db.query(
 	`CREATE TABLE IF NOT EXISTS messages(
-    id int primary key auto_increment,
+    conversation_id VARCHAR(200) primary key,
     sender int not null,
     receiver int not null,
     message longtext,
