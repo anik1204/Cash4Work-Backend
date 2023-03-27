@@ -26,17 +26,54 @@ function getDate() {
 	return dateString;
 }
 
-function getMessages(req, res) {
-	// getting messages from the database
-	let body = req.body;
-	const { conversation_id } = body;
+async function getMessages(a) {
+	const { conversation_id } = a;
 	const sqlSelect = "SELECT * FROM messages WHERE conversation_id = ?";
-	const sqlFormat = mysql.format(sqlSelect, [conversation_id]);
+	const sqlFormat = mysql.format(sqlSelect, [a]);
+
+	return new Promise((resolve, reject) => {
+		db.getConnection(async (err, connection) => {
+			if (err) reject(err);
+			await connection.query(sqlFormat, (err, results, fields) => {
+				connection.release();
+				if (err) reject(err);
+				console.log("messages: ", results);
+				resolve(results);
+			});
+		});
+	});
+}
+
+function insertMessage(a) {
+	const { conversation_id, sender, receiver, message, msg_date } = a;
+	const sqlInsert = `INSERT INTO messages (conversation_id, sender, receiver, message, msg_date) 
+		SELECT ?, ?, ?, ?, ? 
+		FROM dual 
+		WHERE NOT EXISTS (
+		SELECT * FROM messages 
+		WHERE conversation_id = ? 
+			AND sender = ? 
+			AND receiver = ? 
+			AND message = ? 
+			AND msg_date = ?
+		);`;
+	const sqlFormat = mysql.format(sqlInsert, [
+		conversation_id,
+		sender,
+		receiver,
+		message,
+		msg_date,
+		conversation_id,
+		sender,
+		receiver,
+		message,
+		msg_date,
+	]);
 	db.getConnection(async (err, connection) => {
 		if (err) throw err;
 		await connection.query(sqlFormat, (err, results, fields) => {
 			if (err) throw err;
-			res.json(results);
+			console.log("messages: ", results);
 		});
 	});
 }
@@ -67,4 +104,4 @@ function pullMessages(a) {
 	res.json(conversation);
 }
 
-module.exports = { pushMessages, pullMessages };
+module.exports = { pushMessages, pullMessages, insertMessage, getMessages };

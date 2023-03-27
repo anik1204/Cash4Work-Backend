@@ -13,9 +13,15 @@ const ratingController = require("./controller/rating");
 const jobController = require("./controller/job");
 const messageController = require("./controller/message");
 
-const { pushMessages, pullMessages } = require("./modules/message");
+const {
+	pushMessages,
+	pullMessages,
+	insertMessage,
+	getMessages,
+} = require("./modules/message");
 //importing token authentication
 const auth = require("./middleware/auth");
+let userSocketId = [];
 
 app.use(cors({ credentials: true, origin: true }));
 
@@ -38,16 +44,25 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
 	console.log("a user connected");
 	socket.on("join", (data) => {
+		userSocketId[data] = socket.id;
+	});
+	socket.on("chat", (data) => {
 		console.log(data);
 		socket.join("id: " + data); // using room of socket io
+		getMessages(data).then((messages) => {
+			io.to("id: " + data).emit("chatHistory", messages);
+		});
+		//	io.to("id: " + data).emit("chatHistory", getMessages(data));
 	});
-	socket.on("disconnect", () => {
-		console.log("user disconnected");
+	socket.on("disconnect", (data) => {
+		console.log("user disconnected ", data);
+		userSocketId[data] = null;
 	});
 
 	socket.on("chat message", (msg) => {
-		console.log("message: " + msg[0]);
-		io.to("id: " + msg[0]).emit("chat message", msg[1]);
+		insertMessage(msg[0]);
+		console.log(msg);
+		io.to("id: " + msg[0].conversation_id).emit("chat message", msg[0]);
 	});
 });
 
