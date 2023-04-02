@@ -27,9 +27,10 @@ function getDate() {
 }
 
 async function getMessages(a) {
-	const { conversation_id } = a;
-	const sqlSelect = "SELECT * FROM messages WHERE conversation_id = ?";
-	const sqlFormat = mysql.format(sqlSelect, [a]);
+	const { conversation_id, type } = a;
+	const sqlSelect =
+		"SELECT * FROM messages WHERE conversation_id = ? AND type = ?;";
+	const sqlFormat = mysql.format(sqlSelect, [a, type]);
 
 	return new Promise((resolve, reject) => {
 		db.getConnection(async (err, connection) => {
@@ -45,9 +46,9 @@ async function getMessages(a) {
 }
 
 function insertMessage(a) {
-	const { conversation_id, sender, receiver, message, msg_date } = a;
-	const sqlInsert = `INSERT INTO messages (conversation_id, sender, receiver, message, msg_date) 
-		SELECT ?, ?, ?, ?, ? 
+	const { conversation_id, sender, receiver, message, msg_date, type } = a;
+	const sqlInsert = `INSERT INTO messages (conversation_id, sender, receiver, message, msg_date, type) 
+		SELECT ?, ?, ?, ?, ?, ? 
 		FROM dual 
 		WHERE NOT EXISTS (
 		SELECT * FROM messages 
@@ -56,6 +57,7 @@ function insertMessage(a) {
 			AND receiver = ? 
 			AND message = ? 
 			AND msg_date = ?
+			AND type = ?
 		);`;
 	const sqlFormat = mysql.format(sqlInsert, [
 		conversation_id,
@@ -63,11 +65,13 @@ function insertMessage(a) {
 		receiver,
 		message,
 		msg_date,
+		type,
 		conversation_id,
 		sender,
 		receiver,
 		message,
 		msg_date,
+		type,
 	]);
 	db.getConnection(async (err, connection) => {
 		if (err) throw err;

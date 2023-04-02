@@ -12,6 +12,7 @@ const userController = require("./controller/user");
 const ratingController = require("./controller/rating");
 const jobController = require("./controller/job");
 const messageController = require("./controller/message");
+const workerController = require("./controller/worker");
 
 const {
 	pushMessages,
@@ -32,6 +33,7 @@ app.use("/user", userController);
 app.use("/rating", ratingController);
 app.use("/jobs", jobController);
 app.use("/message", messageController);
+app.use("/worker", workerController);
 app.post("/welcome", auth, (req, res) => {
 	res.status(200).send("Welcome 🙌 ");
 });
@@ -48,9 +50,9 @@ io.on("connection", (socket) => {
 	});
 	socket.on("chat", (data) => {
 		console.log(data);
-		socket.join("id: " + data); // using room of socket io
+		socket.join("id: " + data.conversation_id); // using room of socket io
 		getMessages(data).then((messages) => {
-			io.to("id: " + data).emit("chatHistory", messages);
+			io.to("id: " + data.conversation_id).emit("chatHistory", messages);
 		});
 		//	io.to("id: " + data).emit("chatHistory", getMessages(data));
 	});

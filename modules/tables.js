@@ -38,6 +38,22 @@ db.query(
 );
 
 db.query(
+	`CREATE TABLE IF NOT EXISTS workers(
+    id int primary key auto_increment,
+    user_id int not null,
+    title varchar(255) not null,
+    description longtext not null,
+    location varchar(255) not null,
+    salary float,
+    post_date DATETIME)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
+
+db.query(
 	`CREATE TABLE IF NOT EXISTS user_ratings(
     id int primary key auto_increment,
     user_id int not null,
@@ -67,11 +83,13 @@ db.query(
 
 db.query(
 	`CREATE TABLE IF NOT EXISTS messages(
-    conversation_id VARCHAR(200) primary key,
+    id int primary key auto_increment,
+    conversation_id VARCHAR(200),
     sender int not null,
     receiver int not null,
     message longtext,
-    msg_date DATETIME
+    msg_date DATETIME,
+    type text not null
 )`,
 	function (err, results, fields) {
 		if (err) {

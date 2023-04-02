@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-const crypto = require("crypto");
 const mysql = require("mysql");
 const db = require("../modules/dbCon");
 router.use(cors());
 const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken");
 dotenv.config();
 const NodeGeocoder = require("node-geocoder");
 
@@ -48,8 +46,8 @@ router.post("/", async (req, res) => {
 		await geocoder
 			.geocode(location)
 			.then((res) => {
-				 latitude = res[0].latitude;
-				 longitude = res[0].longitude;
+				latitude = res[0].latitude;
+				longitude = res[0].longitude;
 				console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 			})
 			.catch((err) => {
@@ -74,7 +72,9 @@ router.post("/", async (req, res) => {
 				connection.release();
 				if (err) throw err;
 				console.log(result.insertId);
-				res.status(201).send({ message: "Job Posted Successfully.", id: result.insertId });
+				res
+					.status(201)
+					.send({ message: "Job Posted Successfully.", id: result.insertId });
 			});
 		});
 	} else
@@ -121,12 +121,13 @@ router.post("/apply", async (req, res) => {
 			applied_by,
 			getDate(),
 		]);
-		const sqlSelect = "SELECT * FROM applied_jobs WHERE applied_by = ? AND job_id = ?";
+		const sqlSelect =
+			"SELECT * FROM applied_jobs WHERE applied_by = ? AND job_id = ?";
 		const select_query = mysql.format(sqlSelect, [applied_by, job_id]);
 		await connection.query(select_query, (err, result) => {
 			connection.release();
 			if (err) throw err;
-			if(result.length > 0){
+			if (result.length > 0) {
 				res.status(200).send({ message: "Already applied to this job." });
 				return;
 			}
@@ -155,6 +156,5 @@ router.get("/applied/:id", async (req, res) => {
 		});
 	});
 });
-
 
 module.exports = router;
