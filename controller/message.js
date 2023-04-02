@@ -32,7 +32,7 @@ router.get("/conv/:id", (req, res) => {
 	res.json(pullMessages({ conversation_id: id }));
 });
 
-router.get("/list/:user_id", (req, res) => {
+router.get("/list/:user_id/:type", (req, res) => {
 	const { user_id } = req.params;
 	const sqlSelect = `SELECT jobs.title, jobs.posted_by, jobs.id AS job_id, users1.fname AS posted_by_fname, users1.lname AS posted_by_lname, applied_by, users2.fname AS applied_by_fname, users2.lname AS applied_by_lname 
     FROM jobs 

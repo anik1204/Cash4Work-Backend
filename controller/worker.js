@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
 		"location" in body &&
 		"salary" in body
 	) {
-		const { user_id, title, posted_by, description, location, salary } = body;
+		const { user_id, title, description, location, salary } = body;
 		db.getConnection(async (err, connection) => {
 			if (err) throw err;
 			const sqlInsert = "INSERT INTO workers VALUES (0,?,?,?,?,?,?)";
@@ -58,7 +58,7 @@ router.post("/", async (req, res) => {
 	} else
 		res.send({
 			message:
-				"Please include all the necessary infromation { user_id, title, posted_by, description, location, salary }",
+				"Please include all the necessary infromation { user_id, title, description, location, salary }",
 		});
 });
 
@@ -68,7 +68,7 @@ router.get("/", async (req, res) => {
 		const sqlSelect = `
             SELECT workers.*, CONCAT(users.fname, ' ', users.lname) AS name, users.reg_date
             FROM workers
-            INNER JOIN users ON workers.user_id = users.id;`;
+            LEFT JOIN users ON workers.user_id = users.id;`;
 		await connection.query(sqlSelect, (err, result) => {
 			connection.release();
 			if (err) throw err;
