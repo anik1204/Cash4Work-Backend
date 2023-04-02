@@ -40,7 +40,7 @@ db.query(
 db.query(
 	`CREATE TABLE IF NOT EXISTS workers(
     id int primary key auto_increment,
-    user_id int not null,
+    posted_by int not null,
     title varchar(255) not null,
     description longtext not null,
     location varchar(255) not null,
@@ -102,6 +102,19 @@ db.query(
 	`CREATE TABLE IF NOT EXISTS applied_jobs(
     id int primary key auto_increment,
     job_id int not null,
+    applied_by int not null,
+    apply_date DATETIME
+)`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
+db.query(
+	`CREATE TABLE IF NOT EXISTS applied_workers(
+    id int primary key auto_increment,
+    work_id int not null,
     applied_by int not null,
     apply_date DATETIME
 )`,

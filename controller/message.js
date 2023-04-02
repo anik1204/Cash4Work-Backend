@@ -33,35 +33,66 @@ router.get("/conv/:id", (req, res) => {
 });
 
 router.get("/list/:user_id/:type", (req, res) => {
-	const { user_id } = req.params;
-	const sqlSelect = `SELECT jobs.title, jobs.posted_by, jobs.id AS job_id, users1.fname AS posted_by_fname, users1.lname AS posted_by_lname, applied_by, users2.fname AS applied_by_fname, users2.lname AS applied_by_lname 
-    FROM jobs 
-    JOIN users AS users1 ON jobs.posted_by = users1.id 
-    JOIN applied_jobs ON jobs.id = applied_jobs.job_id 
-    JOIN users AS users2 ON applied_jobs.applied_by = users2.id 
-    WHERE applied_by = ? OR posted_by = ?;`;
-	const sqlFormat = mysql.format(sqlSelect, [user_id, user_id]);
-	db.getConnection(async (err, connection) => {
-		if (err) throw err;
-		await connection.query(sqlFormat, (err, results, fields) => {
+	const { user_id, type } = req.params;
+	if(type === "applicants") {
+		const sqlSelect = `SELECT jobs.title, jobs.posted_by, jobs.id AS job_id, users1.fname AS posted_by_fname, users1.lname AS posted_by_lname, applied_by, users2.fname AS applied_by_fname, users2.lname AS applied_by_lname 
+		FROM jobs 
+		JOIN users AS users1 ON jobs.posted_by = users1.id 
+		JOIN applied_jobs ON jobs.id = applied_jobs.job_id 
+		JOIN users AS users2 ON applied_jobs.applied_by = users2.id 
+		WHERE applied_by = ? OR posted_by = ?;`;
+		const sqlFormat = mysql.format(sqlSelect, [user_id, user_id]);
+		db.getConnection(async (err, connection) => {
 			if (err) throw err;
-			let finalResult = [];
-			results.forEach((result) => {
-				finalResult.push({
-					title: result.title,
-					posted_by: result.posted_by,
-					posted_by_fname: result.posted_by_fname,
-					posted_by_lname: result.posted_by_lname,
-					applied_by_fname: result.applied_by_fname,
-					applied_by_lname: result.applied_by_lname,
-					job_id: result.job_id,
-					applied_by: result.applied_by,
+			await connection.query(sqlFormat, (err, results, fields) => {
+				if (err) throw err;
+				let finalResult = [];
+				results.forEach((result) => {
+					finalResult.push({
+						title: result.title,
+						posted_by: result.posted_by,
+						posted_by_fname: result.posted_by_fname,
+						posted_by_lname: result.posted_by_lname,
+						applied_by_fname: result.applied_by_fname,
+						applied_by_lname: result.applied_by_lname,
+						job_id: result.job_id,
+						applied_by: result.applied_by,
+					});
 				});
+				console.log(finalResult);
+				res.json(finalResult);
 			});
-			console.log(finalResult);
-			res.json(finalResult);
 		});
-	});
+	} else if(type === "workers") {
+		const sqlSelect = `SELECT workers.title, workers.posted_by, workers.id AS work_id, users1.fname AS posted_by_fname, users1.lname AS posted_by_lname, applied_by, users2.fname AS applied_by_fname, users2.lname AS applied_by_lname 
+		FROM workers 
+		JOIN users AS users1 ON workers.posted_by = users1.id 
+		JOIN applied_workers ON workers.id = applied_workers.work_id 
+		JOIN users AS users2 ON applied_workers.applied_by = users2.id 
+		WHERE applied_by = ? OR posted_by = ?;`;
+		const sqlFormat = mysql.format(sqlSelect, [user_id, user_id]);
+		db.getConnection(async (err, connection) => {
+			if (err) throw err;
+			await connection.query(sqlFormat, (err, results, fields) => {
+				if (err) throw err;
+				let finalResult = [];
+				results.forEach((result) => {
+					finalResult.push({
+						title: result.title,
+						posted_by: result.posted_by,
+						posted_by_fname: result.posted_by_fname,
+						posted_by_lname: result.posted_by_lname,
+						applied_by_fname: result.applied_by_fname,
+						applied_by_lname: result.applied_by_lname,
+						job_id: result.work_id,
+						applied_by: result.applied_by,
+					});
+				});
+				console.log(finalResult);
+				res.json(finalResult);
+			});
+		});
+	}
 });
 
 module.exports = router;

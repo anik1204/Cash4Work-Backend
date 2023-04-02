@@ -111,9 +111,37 @@ router.get("/:id", async (req, res) => {
 
 router.post("/message", async (req, res) => {
 	let body = req.body;
+	const { work_id, applied_by, posted_by } = body;
+	db.getConnection(async (err, connection) => {
+		if (err) throw err;
+		const sqlInsert = "INSERT INTO applied_workers VALUES (0,?,?,?)";
+		const insert_query = mysql.format(sqlInsert, [
+			work_id,
+			applied_by,
+			getDate(),
+		]);
+		const sqlSelect =
+			"SELECT * FROM applied_worker WHERE applied_by = ? AND work_id = ?";
+		const select_query = mysql.format(sqlSelect, [applied_by, work_id]);
+		await connection.query(select_query, (err, result) => {
+			connection.release();
+			if (err) throw err;
+			if (result.length > 0) {
+				res.status(200).send({ message: "Already messaged this worker." });
+				return;
+			}
+		});
+		db.getConnection(async (err, connection) => {
+			await connection.query(insert_query, async (err, result) => {
+				connection.release();
+				if (err) throw err;
+				console.log(result.insertId);
+				res.status(201).send({ message: "Sent message successfully." });
+			});
+		});
+	});
 	if ("work_id" in body && "sender" in body && "receiver" in body) {
-		const { work_id, sender, receiver } = body;
-		let conversation_id = sender + "-" + receiver + "-" + work_id;
+		let conversation_id = applied_by + "-" + posted_by + "-" + work_id;
 		const sqlInsert = `INSERT INTO messages (conversation_id, sender, receiver, message, msg_date, type) 
 		SELECT ?, ?, ?, ?, ?, ? 
 		FROM dual 
