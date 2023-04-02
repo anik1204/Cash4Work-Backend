@@ -68,7 +68,7 @@ router.get("/", async (req, res) => {
 		const sqlSelect = `
             SELECT workers.*, CONCAT(users.fname, ' ', users.lname) AS name, users.reg_date
             FROM workers
-            LEFT JOIN users ON workers.user_id = users.id;`;
+            LEFT JOIN users ON workers.posted_by = users.id;`;
 		await connection.query(sqlSelect, (err, result) => {
 			connection.release();
 			if (err) throw err;
@@ -121,7 +121,7 @@ router.post("/message", async (req, res) => {
 			getDate(),
 		]);
 		const sqlSelect =
-			"SELECT * FROM applied_worker WHERE applied_by = ? AND work_id = ?";
+			"SELECT * FROM applied_workers WHERE applied_by = ? AND work_id = ?";
 		const select_query = mysql.format(sqlSelect, [applied_by, work_id]);
 		await connection.query(select_query, (err, result) => {
 			connection.release();
@@ -136,7 +136,6 @@ router.post("/message", async (req, res) => {
 				connection.release();
 				if (err) throw err;
 				console.log(result.insertId);
-				res.status(201).send({ message: "Sent message successfully." });
 			});
 		});
 	});

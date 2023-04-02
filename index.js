@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
 		userSocketId[data] = socket.id;
 	});
 	socket.on("chat", (data) => {
-		console.log(data);
+		console.log("data at 52", data);
 		socket.join("id: " + data.conversation_id); // using room of socket io
 		getMessages(data).then((messages) => {
 			io.to("id: " + data.conversation_id).emit("chatHistory", messages);
@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
 
 	socket.on("chat message", (msg) => {
 		insertMessage(msg[0]);
-		console.log(msg);
+		console.log("chat message: ", msg);
 		io.to("id: " + msg[0].conversation_id).emit("chat message", msg[0]);
 	});
 });

@@ -27,10 +27,11 @@ function getDate() {
 }
 
 async function getMessages(a) {
+	console.log("getMessages: ", a);
 	const { conversation_id, type } = a;
 	const sqlSelect =
 		"SELECT * FROM messages WHERE conversation_id = ? AND type = ?;";
-	const sqlFormat = mysql.format(sqlSelect, [a, type]);
+	const sqlFormat = mysql.format(sqlSelect, [conversation_id, type]);
 
 	return new Promise((resolve, reject) => {
 		db.getConnection(async (err, connection) => {
