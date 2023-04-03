@@ -182,4 +182,21 @@ router.post("/message", async (req, res) => {
 		});
 });
 
+router.get("/messaged/:id", async (req, res) => {
+	const id = req.params.id;
+	db.getConnection(async (err, connection) => {
+		if (err) throw err;
+		const sqlSelect = `SELECT * FROM applied_workers WHERE applied_by = ?`;
+		const select_query = mysql.format(sqlSelect, [id]);
+		db.getConnection(async (err, connection) => {
+			if (err) throw err;
+			await connection.query(select_query, (err, result) => {
+				connection.release();
+				if (err) throw err;
+				res.status(200).send(result);
+			});
+		});
+	});
+});
+
 module.exports = router;

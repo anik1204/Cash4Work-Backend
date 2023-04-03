@@ -13,6 +13,7 @@ const ratingController = require("./controller/rating");
 const jobController = require("./controller/job");
 const messageController = require("./controller/message");
 const workerController = require("./controller/worker");
+const profileController = require("./controller/profile");
 
 const {
 	pushMessages,
@@ -34,6 +35,7 @@ app.use("/rating", ratingController);
 app.use("/jobs", jobController);
 app.use("/message", messageController);
 app.use("/worker", workerController);
+app.use("/profile", profileController);
 app.post("/welcome", auth, (req, res) => {
 	res.status(200).send("Welcome 🙌 ");
 });

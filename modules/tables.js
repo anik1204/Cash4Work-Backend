@@ -124,3 +124,35 @@ db.query(
 		}
 	}
 );
+
+db.query(
+	`CREATE TABLE IF NOT EXISTS education(
+    id int primary key auto_increment,
+    user_id int not null,
+    institute varchar(255) not null,
+    degree varchar(255) not null,
+    from_yr numeric(4),
+    to_yr numeric(4))`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
+
+db.query(
+	`CREATE TABLE IF NOT EXISTS experience(
+    id int primary key auto_increment,
+    user_id int not null,
+    company varchar(255) not null,
+    position varchar(255) not null,
+    from_yr numeric(4),
+    to_yr numeric(4))`,
+	function (err, results, fields) {
+		if (err) {
+			console.log(err.message);
+		}
+	}
+);
+
+console.log("Tables created successfully");
