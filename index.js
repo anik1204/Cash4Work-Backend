@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
 		userSocketId[data] = socket.id;
 	});
 	socket.on("chat", (data) => {
-		console.log("data at 52", data);
+		//console.log("data at 52", data);
 		socket.join("id: " + data.conversation_id); // using room of socket io
 		getMessages(data).then((messages) => {
 			io.to("id: " + data.conversation_id).emit("chatHistory", messages);
