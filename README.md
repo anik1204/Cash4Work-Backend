@@ -38,3 +38,25 @@
 - /jobs/applied/:userId
   - GET Request only
   - returns all the jobs user has applied to
+  
+- /worker
+  - POST Request for posting
+    - Must include these fields { user_id, title, description, location, salary }
+  - GET request for getting all the workers
+  
+- /worker/:id
+  - GET Request
+  - Get specific work info
+  
+- /profile/education/user/:userId
+  - GET Request
+  - Pass the user id as parameter to get all the education list of the user
+  
+- /profile/education
+  - POST request
+  - Create new education record of user
+  - Must pass these values { user_id, institute, degree, from_yr, to_yr }
+  
+- /profile/education/:educationId
+  - PUT request
+  - Update education record by educationID
